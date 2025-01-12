@@ -32,17 +32,15 @@ public class RobotContainer
 {
   
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
+  // Controller Defintions
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   private final XboxController m_driverController_HID = m_driverController.getHID();
 
-  // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/falcon"));
+  // Subsystem Definitions
+  private final SwerveSubsystem m_swerveSubsystem  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/falcon"));
 
-  /**
-   * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
-   */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+  // Main Drive Definitions
+  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
                                                                 () -> m_driverController_HID.getLeftY() * -1,
                                                                 () -> m_driverController_HID.getLeftX() * -1)
                                                             .withControllerRotationAxis(m_driverController_HID::getRightX)
@@ -50,11 +48,9 @@ public class RobotContainer
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
 
-  Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+  Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
+
   public RobotContainer()
   {
     configureBindings();
@@ -71,36 +67,35 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    // (Condition) ? Return-On-True : Return-on-False
-    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
     if (Robot.isSimulation())
     {
-      m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      m_driverController.start().onTrue(Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
     if (DriverStation.isTest())
     {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); 
+      m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity); 
 
-      m_driverController.b().whileTrue(drivebase.sysIdAngleMotorCommand());
-      m_driverController.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      m_driverController.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      m_driverController.back().whileTrue(drivebase.centerModulesCommand());
+      m_driverController.b().whileTrue(m_swerveSubsystem.sysIdAngleMotorCommand());
+      m_driverController.x().whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
+      m_driverController.y().whileTrue(m_swerveSubsystem.driveToDistanceCommand(1.0, 0.2));
+      m_driverController.start().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+      m_driverController.back().whileTrue(m_swerveSubsystem.centerModulesCommand());
       m_driverController.leftBumper().onTrue(Commands.none());
       m_driverController.rightBumper().onTrue(Commands.none());
     } else
     {
-      m_driverController.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      m_driverController.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      m_driverController.a().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+      m_driverController.x().onTrue(Commands.runOnce(m_swerveSubsystem::addFakeVisionReading));
       m_driverController.b().whileTrue(
-          drivebase.driveToPose(
+          m_swerveSubsystem.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               );
-      m_driverController.y().whileTrue(drivebase.aimAtSpeaker(2));
+      m_driverController.y().whileTrue(m_swerveSubsystem.aimAtSpeaker(2));
       m_driverController.start().whileTrue(Commands.none());
       m_driverController.back().whileTrue(Commands.none());
-      m_driverController.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      m_driverController.leftBumper().whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
       m_driverController.rightBumper().onTrue(Commands.none());
     }
 
@@ -114,7 +109,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return m_swerveSubsystem.getAutonomousCommand("New Auto");
   }
 
   public void setDriveMode()
@@ -124,6 +119,6 @@ public class RobotContainer
 
   public void setMotorBrake(boolean brake)
   {
-    drivebase.setMotorBrake(brake);
+    m_swerveSubsystem.setMotorBrake(brake);
   }
 }
