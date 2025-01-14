@@ -77,7 +77,7 @@ public class RobotContainer
     {
       m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity); 
 
-      m_driverController.b().whileTrue(m_swerveSubsystem.sysIdAngleMotorCommand());
+      m_driverController.b().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
       m_driverController.x().whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
       m_driverController.y().whileTrue(m_swerveSubsystem.driveToDistanceCommand(1.0, 0.2));
       m_driverController.start().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
