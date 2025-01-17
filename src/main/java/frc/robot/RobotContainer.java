@@ -12,13 +12,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Commands.AbsoluteDriveAdv;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Commands.AbsoluteDriveAdv;
 import frc.robot.Subsystems.SwerveSubsystem;
 
 import java.io.File;
@@ -29,7 +32,19 @@ public class RobotContainer {
   // Auto Chooser Definitions
   private final SendableChooser<Command> autoChooser;
   // Controller Defitions
-  private final CommandXboxController driverXbox = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+
+  private final Trigger A_Button = new Trigger(() -> m_driverController.getHID().getAButton());
+  private final Trigger B_Button = new Trigger(() -> m_driverController.getHID().getBButton());
+  private final Trigger X_Button = new Trigger(() -> m_driverController.getHID().getXButton());
+  private final Trigger Y_Button = new Trigger(() -> m_driverController.getHID().getYButton());
+
+  private final Trigger POV_UP = new Trigger(m_driverController.povUp());
+  private final Trigger POV_DOWN = new Trigger(m_driverController.povDown());
+  private final Trigger POV_LEFT = new Trigger(m_driverController.povLeft());
+  private final Trigger POV_RIGHT = new Trigger(m_driverController.povRight());
+
+
   // Subsystem Defintions
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/falcon"));
@@ -43,25 +58,25 @@ public class RobotContainer {
   // WARNING: default buttons are on the same buttons as the ones defined in
   // configureBindings
   AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(m_swerveSubsystem,
-      () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
+      () -> -MathUtil.applyDeadband(m_driverController.getLeftY(),
           OperatorConstants.DRIVER_DEADBAND),
-      () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
+      () -> -MathUtil.applyDeadband(m_driverController.getLeftX(),
           OperatorConstants.DRIVER_DEADBAND),
-      () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
+      () -> -MathUtil.applyDeadband(m_driverController.getRightX(),
           OperatorConstants.DRIVER_DEADBAND),
-      driverXbox.getHID()::getYButtonPressed,
-      driverXbox.getHID()::getAButtonPressed,
-      driverXbox.getHID()::getXButtonPressed,
-      driverXbox.getHID()::getBButtonPressed);
+      m_driverController.getHID()::getYButtonPressed,
+      m_driverController.getHID()::getAButtonPressed,
+      m_driverController.getHID()::getXButtonPressed,
+      m_driverController.getHID()::getBButtonPressed);
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
    * by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-      () -> driverXbox.getLeftY(),
-      () -> driverXbox.getLeftX())
-      .withControllerRotationAxis(() -> -driverXbox.getRightX() * OperatorConstants.ROTATION_SPEED)
+      () -> m_driverController.getLeftY(),
+      () -> m_driverController.getLeftX())
+      .withControllerRotationAxis(() -> -m_driverController.getRightX() * OperatorConstants.ROTATION_SPEED)
       .deadband(OperatorConstants.DRIVER_DEADBAND)
       .scaleTranslation(OperatorConstants.TRANSLATION_SPEED)
       .allianceRelativeControl(true);
@@ -71,8 +86,8 @@ public class RobotContainer {
    * input stream.
    */
   SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(
-      driverXbox::getRightX,
-      driverXbox::getRightY)
+      m_driverController::getRightX,
+      m_driverController::getRightY)
       .headingWhile(true);
 
   // Applies deadbands and inverts controls because joysticks
@@ -93,9 +108,9 @@ public class RobotContainer {
 
   // Simulation Drive CMDs
   SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-      () -> -driverXbox.getLeftY(),
-      () -> -driverXbox.getLeftX())
-      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
+      () -> -m_driverController.getLeftY(),
+      () -> -m_driverController.getLeftX())
+      .withControllerRotationAxis(() -> m_driverController.getRawAxis(2))
       .deadband(OperatorConstants.DRIVER_DEADBAND)
       .scaleTranslation(OperatorConstants.TRANSLATION_SPEED)
       .allianceRelativeControl(true);
@@ -103,11 +118,11 @@ public class RobotContainer {
   // Derive the heading axis with math
   SwerveInputStream driveDirectAngleSim = driveAngularVelocitySim.copy()
       .withControllerHeadingAxis(() -> Math.sin(
-          driverXbox.getRawAxis(
+          m_driverController.getRawAxis(
               2) * Math.PI)
           * (Math.PI * 2),
           () -> Math.cos(
-              driverXbox.getRawAxis(
+              m_driverController.getRawAxis(
                   2) * Math.PI)
               *
               (Math.PI * 2))
@@ -143,25 +158,23 @@ public class RobotContainer {
 
     if (Robot.isSimulation()) {
     // Odometry Reset
-      driverXbox.start().onTrue(Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-    // SysID CMD
-      driverXbox.button(1).whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+      m_driverController.start().onTrue(Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     // Add Fake Vision Reading
-      driverXbox.b().onTrue(Commands.runOnce(m_swerveSubsystem :: addFakeVisionReading));
+      B_Button.onTrue(Commands.runOnce(m_swerveSubsystem :: addFakeVisionReading));
 
     } else {
       // Zero Gyro
-      driverXbox.a().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+      A_Button.onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
       // Drive to Pose
-      driverXbox.b().whileTrue(
+      B_Button.whileTrue(
           m_swerveSubsystem.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
       // X Wheels
-      driverXbox.x().whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
+      X_Button.whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
       // Drive 1 meter forward
-      driverXbox.y().whileTrue(m_swerveSubsystem.driveToDistanceCommand(1.0, 0.2));
+      Y_Button.whileTrue(m_swerveSubsystem.driveToDistanceCommand(1.0, 0.2));
       // SysID CMD
-      driverXbox.povUp().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+      POV_UP.whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
 
     }
 
