@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.AbsoluteDriveAdv;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.Subsystems.SwerveSubsystem;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -142,9 +142,12 @@ public class RobotContainer {
         !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedAnglularVelocitySim);
 
     if (Robot.isSimulation()) {
-      driverXbox.start()
-          .onTrue(Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+    // Odometry Reset
+      driverXbox.start().onTrue(Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+    // SysID CMD
       driverXbox.button(1).whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+    // Add Fake Vision Reading
+      driverXbox.b().onTrue(Commands.runOnce(m_swerveSubsystem :: addFakeVisionReading));
 
     } else {
       // Zero Gyro
