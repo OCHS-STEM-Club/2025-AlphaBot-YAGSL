@@ -36,7 +36,6 @@ public class Robot extends LoggedRobot
 
   public Robot()
   {
-    instance = this;
     Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
 if (isReal()) {
@@ -51,6 +50,7 @@ if (isReal()) {
 }
 
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+    instance = this;
   }
 
   public static Robot getInstance()
@@ -109,7 +109,7 @@ Logger.start(); // Start logging! No more data receivers, replay sources, or met
   @Override
   public void disabledPeriodic()
   {
-    if (disabledTimer.hasElapsed(Constants.DriveConstants.WHEEL_LOCK_TIME))
+    if (disabledTimer.hasElapsed(Constants.DrivebaseConstants.WHEEL_LOCK_TIME))
     {
       m_robotContainer.setMotorBrake(false);
       disabledTimer.stop();
