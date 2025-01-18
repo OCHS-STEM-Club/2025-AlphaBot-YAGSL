@@ -35,6 +35,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.proto.Photon;
 import org.photonvision.PhotonUtils;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -112,6 +113,7 @@ public class Vision
    *                    itself correctly.
    * @return The target pose of the AprilTag.
    */
+  @AutoLogOutput
   public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset)
   {
     Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
@@ -130,7 +132,7 @@ public class Vision
    *
    * @param swerveDrive {@link SwerveDrive} instance.
    */
-  @AutoLogOutput
+
   public void updatePoseEstimation(SwerveDrive swerveDrive)
   {
     
@@ -170,6 +172,7 @@ public class Vision
    *
    * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and targets used to create the estimate
    */
+  @AutoLogOutput
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera)
   {
     Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
@@ -188,6 +191,8 @@ public class Vision
     }
     return poseEst;
   }
+
+
   
 
 
@@ -486,6 +491,7 @@ public class Vision
      *
      * @return The result in the cache with the least ambiguous best tracked target. This is not the most recent result!
      */
+    @AutoLogOutput
     public Optional<PhotonPipelineResult> getBestResult()
     {
       if (resultsList.isEmpty())

@@ -59,7 +59,7 @@ public class RobotContainer
                                                                 () -> m_driverController.getHID().getLeftY() * 1,
                                                                 () -> m_driverController.getHID().getLeftX() * 1)
                                                             .withControllerRotationAxis(() -> m_driverController.getHID().getRightX() * -1)
-                                                            .deadband(OperatorConstants.DEADBAND)
+                                                            .deadband(0.1)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
 
