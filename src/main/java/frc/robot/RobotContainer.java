@@ -110,8 +110,8 @@ public class RobotContainer
 
     if (Robot.isSimulation())
     {
-      m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      // m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      // m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
 
     }
     if (DriverStation.isTest())
@@ -126,6 +126,7 @@ public class RobotContainer
       // m_driverController.rightBumper().onTrue(Commands.none());
     } else
     {
+      DRIVER_Y_BUTTON.whileTrue(drivebase.centerModulesCommand());
       DRIVER_A_BUTTON.onTrue((Commands.runOnce(drivebase::zeroGyro)));
       DRIVER_X_BUTTON.onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       DRIVER_B_BUTTON.whileTrue(

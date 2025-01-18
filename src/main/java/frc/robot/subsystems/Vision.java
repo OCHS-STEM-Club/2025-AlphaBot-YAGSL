@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -127,8 +130,10 @@ public class Vision
    *
    * @param swerveDrive {@link SwerveDrive} instance.
    */
+  @AutoLogOutput
   public void updatePoseEstimation(SwerveDrive swerveDrive)
   {
+    
     if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent())
     {
       /*
@@ -138,13 +143,15 @@ public class Vision
        * (This is why teams implement vision system to correct odometry.)
        * Therefore, we must ensure that the actual robot pose is provided in the simulator when updating the vision simulation during the simulation.
        */
-      visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
+      visionSim.update(swerveDrive.getPose());
     }
     for (Cameras camera : Cameras.values())
     {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent())
       {
+
+
         var pose = poseEst.get();
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                          pose.timestampSeconds,
@@ -181,6 +188,7 @@ public class Vision
     }
     return poseEst;
   }
+  
 
 
   /**
@@ -190,7 +198,7 @@ public class Vision
    * @param pose Estimated robot pose.
    * @return Could be empty if there isn't a good reading.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  // @Deprecated(since = "2024", forRemoval = true)
   private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose)
   {
     if (pose.isPresent())
@@ -230,6 +238,11 @@ public class Vision
   }
 
 
+  public PhotonPipelineResult getLatestResult(Cameras camera)
+  {
+
+    return Robot.isReal() ? camera.camera.getLatestResult() : camera.cameraSim.getCamera().getLatestResult();
+  }
   /**
    * Get distance of the robot from the AprilTag pose.
    *
@@ -427,7 +440,7 @@ public class Vision
 
       // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
       robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
-
+      
       poseEstimator = new PhotonPoseEstimator(Vision.fieldLayout,
                                               PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                                               robotToCamTransform);
@@ -511,6 +524,7 @@ public class Vision
      *
      * @return Estimated pose.
      */
+    @AutoLogOutput
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose()
     {
       updateUnreadResults();
@@ -525,6 +539,7 @@ public class Vision
       double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
       double currentTimestamp    = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
       double debounceTime        = Milliseconds.of(15).in(Seconds);
+      
       for (PhotonPipelineResult result : resultsList)
       {
         mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
@@ -554,6 +569,7 @@ public class Vision
      * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets used for
      * estimation.
      */
+    @AutoLogOutput
     private void updateEstimatedGlobalPose()
     {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
@@ -572,6 +588,7 @@ public class Vision
      * @param estimatedPose The estimated pose to guess standard deviations for.
      * @param targets       All targets in this camera frame
      */
+
     private void updateEstimationStdDevs(
         Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets)
     {
