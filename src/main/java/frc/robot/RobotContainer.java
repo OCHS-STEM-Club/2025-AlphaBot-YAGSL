@@ -16,7 +16,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
+
 import java.io.File;
 import swervelib.SwerveInputStream;
 
@@ -29,18 +30,35 @@ public class RobotContainer
 {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController m_driverController = new CommandXboxController(0);
+
+  private final Trigger DRIVER_A_BUTTON = new Trigger(() -> m_driverController.getHID().getAButton());
+  private final Trigger DRIVER_B_BUTTON = new Trigger(() -> m_driverController.getHID().getBButton());
+  private final Trigger DRIVER_X_BUTTON = new Trigger(() -> m_driverController.getHID().getXButton());
+  private final Trigger DRIVER_Y_BUTTON = new Trigger(() -> m_driverController.getHID().getYButton());
+
+  private final Trigger DRIVER_POV_UP = new Trigger(m_driverController.povUp());
+  private final Trigger DRIVER_POV_DOWN = new Trigger(m_driverController.povDown());
+  private final Trigger DRIVER_POV_LEFT = new Trigger(m_driverController.povLeft());
+  private final Trigger DRIVER_POV_RIGHT = new Trigger(m_driverController.povRight());
+
+  private final Trigger DRIVER_LEFT_TRIGGER = new Trigger(m_driverController.leftTrigger());
+  private final Trigger DRIVER_RIGHT_TRIGGER = new Trigger(m_driverController.rightTrigger());
+  private final Trigger DRIVER_LEFT_BUMPER = new Trigger(m_driverController.leftBumper());
+  private final Trigger DRIVER_RIGHT_BUMPER = new Trigger(m_driverController.rightBumper());
+
+
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                                                                                "swerve/falcon"));
+  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+      "swerve/falcon"));
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * -1,
-                                                                () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(driverXbox::getRightX)
+                                                                () -> m_driverController.getHID().getLeftY() * 1,
+                                                                () -> m_driverController.getHID().getLeftX() * 1)
+                                                            .withControllerRotationAxis(() -> m_driverController.getHID().getRightX() * -1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -48,33 +66,17 @@ public class RobotContainer
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
    */
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverXbox::getRightX,
-                                                                                             driverXbox::getRightY)
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(m_driverController::getRightX,
+                                                                                             m_driverController::getRightY)
                                                            .headingWhile(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
    */
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-  .allianceRelativeControl(false);
+                                                             .allianceRelativeControl(false);
 
-  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                   () -> -driverXbox.getLeftY(),
-                                                                   () -> -driverXbox.getLeftX())
-                                                               .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
-                                                               .deadband(OperatorConstants.DEADBAND)
-                                                               .scaleTranslation(0.8)
-                                                               .allianceRelativeControl(true);
-  // Derive the heading axis with math!
-  // SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocitySim.copy()
-  //                                                                    .withControllerHeadingAxis(() -> Math.sin(
-  //                                                                                                   driverXbox.getRawAxis(
-  //                                                                                                       2) * Math.PI) * (Math.PI * 2),
-  //                                                                                               () -> Math.cos(
-  //                                                                                                   driverXbox.getRawAxis(
-  //                                                                                                       2) * Math.PI) *
-  //                                                                                                     (Math.PI * 2))
-  //                                                                    .headingWhile(true);
+ 
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -97,51 +99,43 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    Command driveFieldOrientedDirectAngle         = drivebase.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity    = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity     = drivebase.driveFieldOriented(driveRobotOriented);
-    Command driveSetpointGen                      = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
-    // Command driveFieldOrientedDirectAngleKeyboard      = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-    Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
-    // Command driveSetpointGenKeyboard                   = drivebase.driveWithSetpointGeneratorFieldRelative(
-    //     driveDirectAngleKeyboard);
+    Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
+    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
+    Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
+        driveDirectAngle);
 
-    if (RobotBase.isSimulation())
-    {
-      // drivebase.setDefaultCommand(driveFieldOrientedDirectAngleSim);
-    } else
-    {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    }
+    
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
     if (Robot.isSimulation())
     {
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
 
     }
     if (DriverStation.isTest())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      DRIVER_X_BUTTON.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      DRIVER_Y_BUTTON.whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      // m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // m_driverController.back().whileTrue(drivebase.centerModulesCommand());
+      // m_driverController.leftBumper().onTrue(Commands.none());
+      // m_driverController.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.b().whileTrue(
+      DRIVER_A_BUTTON.onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      DRIVER_X_BUTTON.onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      DRIVER_B_BUTTON.whileTrue(
           drivebase.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               );
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      // m_driverController.start().whileTrue(Commands.none());
+      // m_driverController.back().whileTrue(Commands.none());
+      DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // m_driverController.rightBumper().onTrue(Commands.none());
     }
 
   }

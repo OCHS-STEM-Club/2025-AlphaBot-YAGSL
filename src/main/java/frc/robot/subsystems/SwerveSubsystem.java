@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.swervedrive;
+package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
@@ -30,14 +30,14 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import frc.robot.subsystems.Vision.Cameras;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -68,11 +67,11 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * AprilTag field layout.
    */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean             visionDriveTest     = true;
+  private final boolean             visionDriveTest     = false;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -142,7 +141,6 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
@@ -536,7 +534,6 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return The robot's pose
    */
-  @AutoLogOutput
   public Pose2d getPose()
   {
     return swerveDrive.getPose();
