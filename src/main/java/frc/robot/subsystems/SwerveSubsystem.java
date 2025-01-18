@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 //import org.photonvision.targeting.PhotonPipelineResult;
@@ -75,7 +76,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean visionDriveTest = false;
+  private final boolean visionDriveTest = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -535,6 +536,7 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return The robot's pose
    */
+  @AutoLogOutput
   public Pose2d getPose()
   {
     return swerveDrive.getPose();
