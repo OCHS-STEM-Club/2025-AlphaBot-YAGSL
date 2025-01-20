@@ -63,6 +63,15 @@ public class RobotContainer
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
 
+  SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(drivebase.getSwerveDrive(),
+                                                                () -> m_driverController.getHID().getLeftY() * 1,
+                                                                () -> m_driverController.getHID().getLeftX() * 1)
+                                                            .withControllerRotationAxis(() -> m_driverController.getHID().getRawAxis(2) * -1)
+                                                            .deadband(0.1)
+                                                            .scaleTranslation(0.8)
+                                                            .allianceRelativeControl(true);
+
+
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
    */
@@ -101,6 +110,7 @@ public class RobotContainer
 
     Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocitySim = drivebase.driveFieldOriented(driveAngularVelocitySim);
     Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
     Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
         driveDirectAngle);
@@ -110,8 +120,9 @@ public class RobotContainer
 
     if (Robot.isSimulation())
     {
-      // m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      // m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocitySim);
 
     }
     if (DriverStation.isTest())
