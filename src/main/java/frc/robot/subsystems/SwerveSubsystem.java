@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Vision.Cameras;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -86,10 +85,10 @@ public class SwerveSubsystem extends SubsystemBase
   public SwerveSubsystem(File directory)
   {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try
     {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConstants.MAX_SPEED,
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
                                                                   new Pose2d(new Translation2d(Meter.of(1),
                                                                                                Meter.of(4)),
                                                                              Rotation2d.fromDegrees(0)));
@@ -126,7 +125,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
     swerveDrive = new SwerveDrive(driveCfg,
                                   controllerCfg,
-                                  DriveConstants.MAX_SPEED,
+                                  Constants.MAX_SPEED,
                                   new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
                                              Rotation2d.fromDegrees(0)));
   }
@@ -235,7 +234,7 @@ public class SwerveSubsystem extends SubsystemBase
   // {
 
   //   return run(() -> {
-  //     Optional<PhotonPipelineResult> resultO = vision.getLatestResult(camera);
+  //     Optional<PhotonPipelineResult> resultO = camera.getBestResult();
   //     if (resultO.isPresent())
   //     {
   //       var result = resultO.get();
@@ -535,7 +534,6 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return The robot's pose
    */
-
   public Pose2d getPose()
   {
     return swerveDrive.getPose();
@@ -637,7 +635,7 @@ public class SwerveSubsystem extends SubsystemBase
                                                         headingX,
                                                         headingY,
                                                         getHeading().getRadians(),
-                                                        DriveConstants.MAX_SPEED);
+                                                        Constants.MAX_SPEED);
   }
 
   /**
@@ -657,7 +655,7 @@ public class SwerveSubsystem extends SubsystemBase
                                                         scaledInputs.getY(),
                                                         angle.getRadians(),
                                                         getHeading().getRadians(),
-                                                        DriveConstants.MAX_SPEED);
+                                                        Constants.MAX_SPEED);
   }
 
   /**
