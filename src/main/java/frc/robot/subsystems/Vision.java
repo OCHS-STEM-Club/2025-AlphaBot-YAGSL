@@ -1,4 +1,4 @@
-package frc.robot.Subsystems;
+package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milliseconds;
@@ -131,7 +131,7 @@ public class Vision
   {
     if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent())
     {
-      /*
+      /* 
        * In the maple-sim, odometry is simulated using encoder values, accounting for factors like skidding and drifting.
        * As a result, the odometry may not always be 100% accurate.
        * However, the vision system should be able to provide a reasonably accurate pose estimation, even when odometry is incorrect.
