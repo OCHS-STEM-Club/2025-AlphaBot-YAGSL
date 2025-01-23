@@ -56,9 +56,9 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> m_driverController.getHID().getLeftY() * 1,
-                                                                () -> m_driverController.getHID().getLeftX() * 1)
-                                                            .withControllerRotationAxis(() -> m_driverController.getHID().getRightX() * -1)
+                                                                () -> m_driverController.getLeftY() * 1,
+                                                                () -> m_driverController.getLeftX() * 1)
+                                                            .withControllerRotationAxis(() -> m_driverController.getRawAxis(4) * -1)
                                                             .deadband(0.1)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -141,7 +141,7 @@ public class RobotContainer
       DRIVER_X_BUTTON.onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       DRIVER_B_BUTTON.whileTrue(
           drivebase.driveToPose(
-              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+              new Pose2d(new Translation2d(5.287, 2.642), Rotation2d.fromDegrees(51.212)))
                               );
       // m_driverController.start().whileTrue(Commands.none());
       // m_driverController.back().whileTrue(Commands.none());

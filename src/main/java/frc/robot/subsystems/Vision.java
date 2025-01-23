@@ -53,6 +53,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
  
  import frc.robot.Constants;
  import frc.robot.Robot;
+import frc.robot.Constants.VisionConstants;
  
  public class Vision {
      private final PhotonCamera camera;
@@ -66,14 +67,13 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
  
      public Vision() {
          camera = new PhotonCamera("Center");
- 
-         photonEstimator =
-        new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        new Transform3d(new Translation3d(Units.inchesToMeters(10), 0, Units.inchesToMeters(19.5)), new Rotation3d(0,0,0)));
+
+         photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                 VisionConstants.ROBOT_TO_CAM);
 
          photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
      }
- 
+
      public PhotonPipelineResult getLatestResult() {
          return camera.getLatestResult();
      }
@@ -111,7 +111,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
       * @param estimatedPose The estimated pose to guess standard deviations for.
       */
      public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-         var estStdDevs = VecBuilder.fill(4, 4, 8);
+         var estStdDevs = VisionConstants.kSingleTagStdDevs;
          var targets = getLatestResult().getTargets();
          int numTags = 0;
          double avgDist = 0;
@@ -124,8 +124,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
          }
          if (numTags == 0) return estStdDevs;
          avgDist /= numTags;
-         // Decrease std devs if multiple targets are visible
-         if (numTags > 1) estStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+         // Decrease std devs (standard deviation) if multiple targets are visible
+         if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
          // Increase std devs based on (average) distance
          if (numTags == 1 && avgDist > 4)
              estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
