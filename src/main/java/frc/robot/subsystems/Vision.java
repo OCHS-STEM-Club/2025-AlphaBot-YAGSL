@@ -70,9 +70,6 @@ import frc.robot.Constants.VisionConstants;
      private VisionSystemSim visionSim;
  
      public Vision() {
-        // Vision Sim
-        visionSim = new VisionSystemSim("Vision");
-        visionSim.addAprilTags(kTagLayout);
 
         // Back left Camera
         kBackLeftCamera = new PhotonCamera("Center");
