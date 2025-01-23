@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import java.io.File;
 import java.io.IOException;
@@ -69,18 +70,9 @@ public class SwerveSubsystem extends SubsystemBase
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
-  /**
-   * AprilTag field layout.
-   */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-  /**
-   * Enable vision odometry updates while driving.
-   */
-  private final boolean visionDriveTest = true;
-  /**
-   * PhotonVision class to keep an accurate odometry.
-   */
-  private Vision vision = new Vision();
+  
+  // Vision definitions
+  private Vision Vision = new Vision();
 
   Optional<EstimatedRobotPose> visionEsimatedPoseObj; 
 
@@ -107,6 +99,8 @@ public class SwerveSubsystem extends SubsystemBase
     {
       throw new RuntimeException(e);
     }
+
+    // Tuning Methods
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
@@ -114,7 +108,6 @@ public class SwerveSubsystem extends SubsystemBase
                                                0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
-//    swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
   
     setupPathPlanner();
   }
@@ -142,7 +135,7 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    visionEsimatedPoseObj = vision.getEstimatedGlobalPose();
+    visionEsimatedPoseObj = Vision.getEstimatedGlobalPose();
     
 
      if(visionEsimatedPoseObj.isPresent()){
@@ -152,7 +145,7 @@ public class SwerveSubsystem extends SubsystemBase
         Pose[0] = visionEsimatedPoseObj.get().estimatedPose.getX();
         Pose[1] = visionEsimatedPoseObj.get().estimatedPose.getY();  
         Pose[2] = visionEsimatedPoseObj.get().estimatedPose.toPose2d().getRotation().getDegrees();
-        visionEsimatedStdDevs = vision.getEstimationStdDevs(visionEsimatedPoseObj.get().estimatedPose.toPose2d()); //Get the Standard Deviation
+        visionEsimatedStdDevs = Vision.getEstimationStdDevs(visionEsimatedPoseObj.get().estimatedPose.toPose2d()); //Get the Standard Deviation
         
         SmartDashboard.putNumberArray("Photon Pose", Pose);
         SmartDashboard.putString("Photon Pose", visionEsimatedPoseObj.get().estimatedPose.toString());
@@ -193,8 +186,7 @@ public class SwerveSubsystem extends SubsystemBase
               swerveDrive.drive(
                   speedsRobotRelative,
                   swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
-                  moduleFeedForwards.linearForces()
-                               );
+                  moduleFeedForwards.linearForces());
             } else
             {
               swerveDrive.setChassisSpeeds(speedsRobotRelative);
@@ -275,21 +267,27 @@ public class SwerveSubsystem extends SubsystemBase
    * @param pose Target {@link Pose2d} to go to.
    * @return PathFinding command
    */
-  public Command driveToPose(Pose2d pose)
-  {
-    // PathPlannerPath path = PathPlannerPath.fromPathFile("Test");
-// Create the constraints to use while pathfinding
+  public Command pathfindThenFollowPath(Pose2d pose) {
+   
+    PathPlannerPath path = null;
+    try {
+      path = PathPlannerPath.fromPathFile("Test");
+    } catch (Exception e) {
+      System.out.println("Path not found");
+    }
+    
+    if (path == null) {
+      return Commands.none();
+    }
+    
+    // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
         swerveDrive.getMaximumChassisVelocity(), 4.0,
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
-
-// Since AutoBuilder is configured, we can use it to build pathfinding commands
-    return AutoBuilder.pathfindToPose(
-        pose,
-        constraints // Goal end velocity in meters/sec
-                                     );
+    // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    return AutoBuilder.pathfindThenFollowPath(path, constraints);
   }
-
+  
   /**
    * Drive with {@link SwerveSetpointGenerator} from 254, implemented by PathPlanner.
    *
