@@ -1,0 +1,36 @@
+{
+    "name": "2025 Comp",
+    "sourceUrl": "https://cad.onshape.com/documents/4d1a3716dd78fba725f1d502/w/4c69eb44835d81e7bde07fdd/e/ba6097cc44b5514f88e672ba",
+    "rotations": [
+        {
+            "axis": "x",
+            "degrees": 90
+        },
+        {
+            "axis": "z",
+            "degrees": 0
+        }
+
+    ],
+    "position": [ 0, 0, 0 ],
+    "cameras": [
+        {
+            "name": "Back Left Camera",
+            "rotations": [
+                {
+                    "axis": "z",
+                    "degrees": 75
+                },
+                {
+                    "axis": "y",
+                    "degrees": 0
+                }
+
+            ],
+        "position": [ 0.25, 0.5, 0.5 ],
+            "resolution": [ 800, 600 ],
+            "fov": 50
+        }
+    ],
+    "components": []
+}
