@@ -50,6 +50,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -147,10 +150,15 @@ public class SwerveSubsystem extends SubsystemBase
         Pose[2] = visionEsimatedPoseObj.get().estimatedPose.toPose2d().getRotation().getDegrees();
         visionEsimatedStdDevs = Vision.getEstimationStdDevs(visionEsimatedPoseObj.get().estimatedPose.toPose2d()); //Get the Standard Deviation
         
-        SmartDashboard.putNumberArray("Photon Pose", Pose);
-        SmartDashboard.putString("Photon Pose", visionEsimatedPoseObj.get().estimatedPose.toString());
+        // SmartDashboard.putNumberArray("Photon Pose", Pose);
+        // SmartDashboard.putString("Photon Pose", visionEsimatedPoseObj.get().estimatedPose.toString());
         swerveDrive.addVisionMeasurement(visionEsimatedPoseObj.get().estimatedPose.toPose2d(), visionEsimatedPoseObj.get().timestampSeconds, visionEsimatedStdDevs);
+
+        Logger.recordOutput("Vision Pose", Pose);
+        Logger.recordOutput("Vision Pose String", visionEsimatedPoseObj.get().estimatedPose.toString());
       }
+
+      
 
   }
 
@@ -493,6 +501,7 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return The robot's pose
    */
+  @AutoLogOutput
   public Pose2d getPose()
   {
     return swerveDrive.getPose();

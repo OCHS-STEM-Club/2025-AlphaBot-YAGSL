@@ -38,7 +38,9 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
  import edu.wpi.first.wpilibj2.command.Command;
  
  import java.util.Optional;
- import org.photonvision.EstimatedRobotPose;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.photonvision.EstimatedRobotPose;
  import org.photonvision.PhotonCamera;
  import org.photonvision.PhotonPoseEstimator;
  import org.photonvision.PhotonPoseEstimator.PoseStrategy;
