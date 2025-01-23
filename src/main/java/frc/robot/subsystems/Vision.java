@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
- package frc.robot.subsystems;
+ package frc.robot.Subsystems;
 
  import edu.wpi.first.math.Matrix;
  import edu.wpi.first.math.VecBuilder;
@@ -58,8 +58,10 @@ import org.photonvision.EstimatedRobotPose;
 import frc.robot.Constants.VisionConstants;
  
  public class Vision {
-     private final PhotonCamera camera;
-     private final PhotonPoseEstimator photonEstimator;
+    // Back Left Camera
+     private final PhotonCamera kBackLeftCamera;
+     private final PhotonPoseEstimator backLeftCameraPoseEstimator;
+
      private final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
      private double lastEstTimestamp = 0;
  
@@ -68,16 +70,22 @@ import frc.robot.Constants.VisionConstants;
      private VisionSystemSim visionSim;
  
      public Vision() {
-         camera = new PhotonCamera("Center");
+        // Vision Sim
+        visionSim = new VisionSystemSim("Vision");
+        visionSim.addAprilTags(kTagLayout);
 
-         photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                 VisionConstants.ROBOT_TO_CAM);
+        // Back left Camera
+        kBackLeftCamera = new PhotonCamera("Center");
 
-         photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        backLeftCameraPoseEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                 VisionConstants.BACK_LEFT_CAM_TO_CENTER);
+
+        backLeftCameraPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
      }
 
-     public PhotonPipelineResult getLatestResult() {
-         return camera.getLatestResult();
+     public PhotonPipelineResult getBackLeftLatestResults() {
+         return kBackLeftCamera.getLatestResult();
      }
  
      /**
@@ -87,9 +95,9 @@ import frc.robot.Constants.VisionConstants;
       * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
       *     used for estimation.
       */
-     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-         var visionEst = photonEstimator.update(getLatestResult());
-         double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
+     public Optional<EstimatedRobotPose> getBackLeftGlobalEstimatedPose() {
+         var visionEst = backLeftCameraPoseEstimator.update(getBackLeftLatestResults());
+         double latestTimestamp = kBackLeftCamera.getLatestResult().getTimestampSeconds();
          boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
          if (SwerveDriveTelemetry.isSimulation) {
              visionEst.ifPresentOrElse(
@@ -111,14 +119,16 @@ import frc.robot.Constants.VisionConstants;
       * This should only be used when there are targets visible.
       *
       * @param estimatedPose The estimated pose to guess standard deviations for.
+
+      getEstimationStdDevs
       */
-     public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
+     public Matrix<N3, N1> getBackleftEstimationStdDevs(Pose2d estimatedPose) {
          var estStdDevs = VisionConstants.kSingleTagStdDevs;
-         var targets = getLatestResult().getTargets();
+         var targets = getBackLeftLatestResults().getTargets();
          int numTags = 0;
          double avgDist = 0;
          for (var tgt : targets) {
-             var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+             var tagPose = backLeftCameraPoseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
              if (tagPose.isEmpty()) continue;
              numTags++;
              avgDist +=
@@ -149,7 +159,6 @@ import frc.robot.Constants.VisionConstants;
  
      /** A Field2d for visualizing our robot and objects on the field. */
      public Field2d getSimDebugField() {
-         if (!SwerveDriveTelemetry.isSimulation) return null;
          return visionSim.getDebugField();
      }
  

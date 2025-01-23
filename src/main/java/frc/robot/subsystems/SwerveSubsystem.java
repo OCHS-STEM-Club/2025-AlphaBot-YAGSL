@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
@@ -75,7 +75,7 @@ public class SwerveSubsystem extends SubsystemBase
   private final SwerveDrive swerveDrive;
   
   // Vision definitions
-  private Vision Vision = new Vision();
+  private Vision m_visionSubsystem = new Vision();
 
   Optional<EstimatedRobotPose> visionEsimatedPoseObj; 
 
@@ -138,7 +138,7 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    visionEsimatedPoseObj = Vision.getEstimatedGlobalPose();
+    visionEsimatedPoseObj = m_visionSubsystem.getBackLeftGlobalEstimatedPose();
     
 
      if(visionEsimatedPoseObj.isPresent()){
@@ -148,7 +148,7 @@ public class SwerveSubsystem extends SubsystemBase
         Pose[0] = visionEsimatedPoseObj.get().estimatedPose.getX();
         Pose[1] = visionEsimatedPoseObj.get().estimatedPose.getY();  
         Pose[2] = visionEsimatedPoseObj.get().estimatedPose.toPose2d().getRotation().getDegrees();
-        visionEsimatedStdDevs = Vision.getEstimationStdDevs(visionEsimatedPoseObj.get().estimatedPose.toPose2d()); //Get the Standard Deviation
+        visionEsimatedStdDevs = m_visionSubsystem.getBackleftEstimationStdDevs(visionEsimatedPoseObj.get().estimatedPose.toPose2d()); //Get the Standard Deviation
         
         // SmartDashboard.putNumberArray("Photon Pose", Pose);
         // SmartDashboard.putString("Photon Pose", visionEsimatedPoseObj.get().estimatedPose.toString());
