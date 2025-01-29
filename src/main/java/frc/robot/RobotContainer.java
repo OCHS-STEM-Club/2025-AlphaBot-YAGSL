@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.io.File;
@@ -56,6 +57,8 @@ public class RobotContainer
 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/falcon"));
+
+  private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -109,10 +112,10 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    Command driveFieldOrientedDirectAngle      = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
+    Command driveFieldOrientedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
     Command driveFieldOrientedAnglularVelocitySim = m_swerveSubsystem.driveFieldOriented(driveAngularVelocitySim);
-    Command driveRobotOrientedAngularVelocity  = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
+    Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
     
     m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -130,7 +133,6 @@ public class RobotContainer
     {
       DRIVER_Y_BUTTON.whileTrue(m_swerveSubsystem.centerModulesCommand());
       DRIVER_A_BUTTON.onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
-      DRIVER_X_BUTTON.onTrue(Commands.runOnce(m_swerveSubsystem::addFakeVisionReading));
       DRIVER_B_BUTTON.whileTrue(
           m_swerveSubsystem.pathfindThenFollowPath(
               new Pose2d(
@@ -138,6 +140,9 @@ public class RobotContainer
               Rotation2d.fromDegrees(51.212))));
 
       DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
+
+      DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.setElevatorPositionCommand(m_elevatorSubsystem.getSelectedState()));
+      // DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(100)));
     }
 
   }

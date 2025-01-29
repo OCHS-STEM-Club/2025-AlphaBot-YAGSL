@@ -92,13 +92,13 @@ public final class Constants {
     public static final Distance MIN_HEIGHT = Inches.of(0); 
 
     // Current limit of either motor
-    public static final Current CURRENT_LIMIT = Amps.of(0);//TODO:Find Elevator Current Limit from derek
+    public static final Current CURRENT_LIMIT = Amps.of(20);//TODO:Find Elevator Current Limit from derek
 
     // Left Motor PID Values
     public static final double LEFT_KG = 0;
     public static final double LEFT_KS = 0;
     public static final double LEFT_KV = 0;
-    public static final double LEFT_KP = 0;
+    public static final double LEFT_KP = 1;
     public static final double LEFT_KI = 0;
     public static final double LEFT_KD = 0;
 
@@ -106,7 +106,7 @@ public final class Constants {
     public static final double RIGHT_KG = 0;
     public static final double RIGHT_KS = 0;
     public static final double RIGHT_KV = 0;
-    public static final double RIGHT_KP = 0;
+    public static final double RIGHT_KP = 1;
     public static final double RIGHT_KI = 0;
     public static final double RIGHT_KD = 0;
 
@@ -117,26 +117,26 @@ public final class Constants {
 
     // Elevator Positions
     public static final Distance STATION_POSITION = Inches.of(0);
-    public static final Distance L1_POSITION = Inches.of(0);
-    public static final Distance L2_POSITION = Inches.of(0);
+    public static final Distance L1_POSITION = Inches.of(20);
+    public static final Distance L2_POSITION = Inches.of(30);
     public static final Distance L3_POSITION = Inches.of(0);
     public static final Distance L4_POSITION = Inches.of(0);
     public static final Distance ALGAE_POSITION = Inches.of(0);
 
     // Maximum velocity of the Motors, in Rotations per Second
-    public static final double MAX_VELOCITY_RPS = 0; //TODO:Change this
+    public static final double MAX_VELOCITY_RPS = 10; //TODO:Change this
 
     // Maximum acceleration of the Motors, in Rotations per Second
-    public static final double MAX_ACCEL_RPS = 0; //TODO:Change this
+    public static final double MAX_ACCEL_RPS = 10; //TODO:Change this
 
     public static final Voltage MAX_VOLTS = Volts.of(8);//TODO:Check with Derek about Max Volts
 
     // Creates new set states for the Trapezoid Profile
-    public static final TrapezoidProfile.State STOW_GOAL = new TrapezoidProfile.State(MIN_HEIGHT.magnitude(), 0);
-    public static final TrapezoidProfile.State STATION_GOAL = new TrapezoidProfile.State(STATION_POSITION.magnitude(), 0);
-    public static final TrapezoidProfile.State L1_GOAL = new TrapezoidProfile.State(L1_POSITION.magnitude(), 0);
-    public static final TrapezoidProfile.State L2_GOAL = new TrapezoidProfile.State(L2_POSITION.magnitude(), 0);
-    public static final TrapezoidProfile.State L3_GOAL = new TrapezoidProfile.State(L3_POSITION.magnitude(), 0);
-    public static final TrapezoidProfile.State L4_GOAL = new TrapezoidProfile.State(L4_POSITION.magnitude(), 0);
+    public static final TrapezoidProfile.State STOW_GOAL = new TrapezoidProfile.State(MIN_HEIGHT.magnitude(), 10);
+    public static final TrapezoidProfile.State STATION_GOAL = new TrapezoidProfile.State(STATION_POSITION.magnitude(), 10);
+    public static final TrapezoidProfile.State L1_GOAL = new TrapezoidProfile.State(L1_POSITION.magnitude(), 10);
+    public static final TrapezoidProfile.State L2_GOAL = new TrapezoidProfile.State(L2_POSITION.magnitude(), 10);
+    public static final TrapezoidProfile.State L3_GOAL = new TrapezoidProfile.State(L3_POSITION.magnitude(), 10);
+    public static final TrapezoidProfile.State L4_GOAL = new TrapezoidProfile.State(L4_POSITION.magnitude(), 10);
   }
 }

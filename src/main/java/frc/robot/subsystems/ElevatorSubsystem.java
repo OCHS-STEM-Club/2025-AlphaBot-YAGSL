@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -212,6 +214,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     elevatorLeftMotor.setControl(elevatorRequest);
   }
+
 
   public void setElevatorPosition(double rotations) {
     elevatorLeftMotor.setControl(elevatorRequest.withPosition(rotations));

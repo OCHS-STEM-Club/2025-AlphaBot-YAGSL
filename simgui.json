@@ -64,27 +64,24 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Elevator": "Subsystem",
+      "/SmartDashboard/Elevator/Elevator2d": "Mechanism2d",
+      "/SmartDashboard/Elevator/ElevatorChooser": "String Chooser",
       "/SmartDashboard/Encoders": "Alerts",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/IMU": "Alerts",
       "/SmartDashboard/JSON": "Alerts",
       "/SmartDashboard/Motors": "Alerts",
       "/SmartDashboard/Pigeon 2 (v6) [1]": "Gyro",
-      "/SmartDashboard/Swerve Drive": "Alerts",
-      "/SmartDashboard/VisionSystemSim-Vision/Sim Field": "Field2d"
+      "/SmartDashboard/Swerve Drive": "Alerts"
     },
     "windows": {
-      "/SmartDashboard/Field": {
-        "XModules": {
-          "style": "Hidden"
-        },
-        "bottom": 1638,
-        "builtin": "2025 Reefscape",
-        "height": 8.051901817321777,
-        "left": 534,
-        "right": 3466,
-        "top": 291,
-        "width": 17.54825210571289,
+      "/SmartDashboard/Elevator/Elevator2d": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Elevator/ElevatorChooser": {
         "window": {
           "visible": true
         }
