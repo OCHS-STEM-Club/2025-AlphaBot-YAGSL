@@ -230,11 +230,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   public Command setElevatorPositionCommand(TrapezoidProfile.State goalState) {
     final double deltaTime = 0.02;
     final Timer timer = new Timer();
-
+    System.out.println("elevator go");
+    
     return runOnce(timer::restart)
     .andThen(run(() -> {
       currentElevatorState = elevatorProfile.calculate(deltaTime, getCurrentState(), goalState);
       elevatorLeftMotor.setControl(elevatorRequest.withPosition(currentElevatorState.position));}))
       .until(() -> timer.hasElapsed(elevatorProfile.totalTime()));
+     
   }
 }

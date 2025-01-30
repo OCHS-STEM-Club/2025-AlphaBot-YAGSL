@@ -129,6 +129,8 @@ public class RobotContainer
               new Pose2d(
               new Translation2d(5.287, 2.642), 
               Rotation2d.fromDegrees(51.212))));
+      DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.setElevatorPositionCommand(m_elevatorSubsystem.getSelectedState()));
+
     } else
     {
       DRIVER_Y_BUTTON.whileTrue(m_swerveSubsystem.centerModulesCommand());
