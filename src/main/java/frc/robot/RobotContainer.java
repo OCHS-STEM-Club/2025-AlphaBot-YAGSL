@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.EndEffectorSubsytem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.io.File;
@@ -56,6 +57,7 @@ public class RobotContainer
 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/falcon"));
+  private final EndEffectorSubsytem m_endEffectorSubsytem = new EndEffectorSubsytem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -128,16 +130,24 @@ public class RobotContainer
               Rotation2d.fromDegrees(51.212))));
     } else
     {
-      DRIVER_Y_BUTTON.whileTrue(m_swerveSubsystem.centerModulesCommand());
-      DRIVER_A_BUTTON.onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
-      DRIVER_X_BUTTON.onTrue(Commands.runOnce(m_swerveSubsystem::addFakeVisionReading));
+      DRIVER_LEFT_TRIGGER.whileTrue(
+        Commands.runOnce(m_endEffectorSubsytem::endEffectorMotorOn)
+        );
+
+      DRIVER_RIGHT_BUMPER.whileTrue(
+        Commands.runOnce(m_endEffectorSubsytem::endEffectorMotorReverse)
+        );
+
+      DRIVER_A_BUTTON.onTrue(
+        Commands.runOnce(m_swerveSubsystem::zeroGyro)
+        );
+        
       DRIVER_B_BUTTON.whileTrue(
           m_swerveSubsystem.pathfindThenFollowPath(
               new Pose2d(
               new Translation2d(5.287, 2.642), 
-              Rotation2d.fromDegrees(51.212))));
-
-      DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
+              Rotation2d.fromDegrees(51.212)))
+              );
     }
 
   }
