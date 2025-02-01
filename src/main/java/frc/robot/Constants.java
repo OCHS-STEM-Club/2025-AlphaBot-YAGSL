@@ -63,4 +63,17 @@ public final class Constants {
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
   }
+
+  public static class CoralGroundIntakeConstants {
+    public static final int kCoralGroundIntakeID = 21;
+    public static final int kCoralGroundIntakePivotID = 20;
+    public static final int kCANCoderID = 22; 
+    
+    public static final double kIntakeP = 0;
+    public static final double kIntakeI = 0;
+    public static final double kIntakeD = 0;
+
+    public static final double kIntakeSpeed = 0.25;
+    public static final double kIntakePivotSpeed = 0;
+  }
 }
