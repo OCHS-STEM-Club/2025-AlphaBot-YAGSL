@@ -204,7 +204,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
   @AutoLogOutput
   public String getSelectedString() {
-    // System.out.pr
+    // Syste
     return elevatorChooser.getSelected().toString();
   }
 
