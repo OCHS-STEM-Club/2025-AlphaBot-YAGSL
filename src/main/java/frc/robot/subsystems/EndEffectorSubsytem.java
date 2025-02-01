@@ -28,6 +28,7 @@ public class EndEffectorSubsytem extends SubsystemBase {
                                     .withMotorOutput(new MotorOutputConfigs()
                                     .withInverted(InvertedValue.CounterClockwise_Positive)
                                     .withNeutralMode(NeutralModeValue.Brake));
+
     endEffectorMotor.getConfigurator().apply(endEffectorConfiguration);
 
   }
@@ -36,13 +37,13 @@ public class EndEffectorSubsytem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
-  public void endEffectorMotorOn() {
+  public void endEffectorIntake() {
     endEffectorMotor.set(Constants.EndEffectorConstants.kEndEffectorOnSpeed);
   }
-  public void endEffectorMotorOff() {
+  public void endEffectorOff() {
     endEffectorMotor.set(0);
   }
-  public void endEffectorMotorReverse() {
+  public void endEffectorOutake() {
     endEffectorMotor.set(Constants.EndEffectorConstants.kEndEffectorReverseSpeed);
   }
 }

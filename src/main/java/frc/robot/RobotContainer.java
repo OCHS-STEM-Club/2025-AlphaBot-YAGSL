@@ -131,17 +131,25 @@ public class RobotContainer
     } else
     {
       DRIVER_LEFT_TRIGGER.whileTrue(
-        Commands.runOnce(m_endEffectorSubsytem::endEffectorMotorOn)
+        Commands.runOnce(m_endEffectorSubsytem::endEffectorIntake)
         );
 
-      DRIVER_RIGHT_BUMPER.whileTrue(
-        Commands.runOnce(m_endEffectorSubsytem::endEffectorMotorReverse)
+      DRIVER_RIGHT_BUMPER.whileTrue(driveRobotOrientedAngularVelocity)(
+        Commands.runOnce(m_endEffectorSubsytem::endEffectorOutake)
         );
+
+        DRIVER_LEFT_TRIGGER.whileFalse(
+          Commands.runOnce(m_endEffectorSubsytem::endEffectorOff)
+          );
+  
+        DRIVER_RIGHT_BUMPER.whileFalse(
+          Commands.runOnce(m_endEffectorSubsytem::endEffectorOff)
+          );
 
       DRIVER_A_BUTTON.onTrue(
         Commands.runOnce(m_swerveSubsystem::zeroGyro)
         );
-        
+
       DRIVER_B_BUTTON.whileTrue(
           m_swerveSubsystem.pathfindThenFollowPath(
               new Pose2d(
