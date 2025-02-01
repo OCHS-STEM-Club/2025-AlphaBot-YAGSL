@@ -182,25 +182,30 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
-
+   @AutoLogOutput
   private Angle getElevatorRotations() {
     return elevatorLeftMotor.getPosition().refresh().getValue();
   }
-
+  @AutoLogOutput
   private Distance getElevatorHeight() {
     return ElevatorConstants.FEET_PER_ROTATION.times(getElevatorRotations().in(Rotations));
   }
-
+  @AutoLogOutput
   private LinearVelocity getElevatorVelocity() {
     return FeetPerSecond.of(elevatorLeftMotor.getVelocity().refresh().getValueAsDouble() * ElevatorConstants.FEET_PER_ROTATION.magnitude());
   }
-
+  @AutoLogOutput
   private TrapezoidProfile.State getCurrentState() {
     return new TrapezoidProfile.State(getElevatorHeight().magnitude(), getElevatorVelocity().magnitude());
   }
-
+  
   public TrapezoidProfile.State getSelectedState() {
     return elevatorChooser.getSelected();
+  }
+  @AutoLogOutput
+  public String getSelectedString() {
+    // System.out.println("gotState");
+    return elevatorChooser.getSelected().toString();
   }
 
   public void stopElevator() {
@@ -238,5 +243,11 @@ public class ElevatorSubsystem extends SubsystemBase {
       elevatorLeftMotor.setControl(elevatorRequest.withPosition(currentElevatorState.position));}))
       .until(() -> timer.hasElapsed(elevatorProfile.totalTime()));
      
+  }
+
+  @AutoLogOutput
+  public double getElevatorLeftMotorVelocity(){
+    return elevatorLeftMotor.get();
+
   }
 }

@@ -129,8 +129,8 @@ public class RobotContainer
               new Pose2d(
               new Translation2d(5.287, 2.642), 
               Rotation2d.fromDegrees(51.212))));
-      DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.setElevatorPositionCommand(m_elevatorSubsystem.getSelectedState()));
-
+      DRIVER_X_BUTTON.onTrue(Commands.runOnce(() -> m_elevatorSubsystem.applyElevatorProfile(m_elevatorSubsystem.getSelectedState())));
+      // DRIVER_X_BUTTON.whileTrue(Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(10)));
     } else
     {
       DRIVER_Y_BUTTON.whileTrue(m_swerveSubsystem.centerModulesCommand());
@@ -143,8 +143,7 @@ public class RobotContainer
 
       DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
 
-      DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.setElevatorPositionCommand(m_elevatorSubsystem.getSelectedState()));
-      // DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(100)));
+      DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(100)));
     }
 
   }
