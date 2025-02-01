@@ -134,17 +134,17 @@ public class RobotContainer
         Commands.runOnce(m_endEffectorSubsytem::endEffectorIntake)
         );
 
-      DRIVER_RIGHT_BUMPER.whileTrue(driveRobotOrientedAngularVelocity)(
+      DRIVER_RIGHT_BUMPER.whileTrue(
         Commands.runOnce(m_endEffectorSubsytem::endEffectorOutake)
         );
 
-        DRIVER_LEFT_TRIGGER.whileFalse(
-          Commands.runOnce(m_endEffectorSubsytem::endEffectorOff)
-          );
+      DRIVER_LEFT_TRIGGER.whileFalse(
+        Commands.runOnce(m_endEffectorSubsytem::endEffectorOff)
+        );
   
-        DRIVER_RIGHT_BUMPER.whileFalse(
-          Commands.runOnce(m_endEffectorSubsytem::endEffectorOff)
-          );
+      DRIVER_RIGHT_BUMPER.whileFalse(
+        Commands.runOnce(m_endEffectorSubsytem::endEffectorOff)
+        );
 
       DRIVER_A_BUTTON.onTrue(
         Commands.runOnce(m_swerveSubsystem::zeroGyro)
