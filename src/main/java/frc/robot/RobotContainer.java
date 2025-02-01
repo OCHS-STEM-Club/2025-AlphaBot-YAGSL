@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,6 +12,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -29,7 +32,10 @@ import swervelib.SwerveInputStream;
 public class RobotContainer
 {
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
+  // Choosers
+  private final SendableChooser<Command> autoChooser;
+
+  // Controller Definitions
   final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final Trigger DRIVER_A_BUTTON = new Trigger(() -> m_driverController.getHID().getAButton());
@@ -49,19 +55,27 @@ public class RobotContainer
 
 
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-      "swerve/falcon"));
+  private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/falcon"));
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> m_driverController.getHID().getLeftY() * 1,
-                                                                () -> m_driverController.getHID().getLeftX() * 1)
-                                                            .withControllerRotationAxis(() -> m_driverController.getHID().getRightX() * -1)
-                                                            .deadband(OperatorConstants.DEADBAND)
+  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+                                                                () -> m_driverController.getLeftY() * 1,
+                                                                () -> m_driverController.getLeftX() * 1)
+                                                            .withControllerRotationAxis(() -> m_driverController.getRawAxis(4) * -1)
+                                                            .deadband(0.1)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
+
+  SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+                                                                () -> m_driverController.getLeftY() * 1,
+                                                                () -> m_driverController.getLeftX() * 1)
+                                                            .withControllerRotationAxis(() -> m_driverController.getRawAxis(2) * -1)
+                                                            .deadband(0.1)
+                                                            .scaleTranslation(0.8)
+                                                            .allianceRelativeControl(true);
+
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
@@ -86,74 +100,55 @@ public class RobotContainer
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("TEST", Commands.print("I EXIST"));
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the
-   * named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-   * {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
-   * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
-   */
   private void configureBindings()
   {
 
-    Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
-    Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
-        driveDirectAngle);
+    Command driveFieldOrientedDirectAngle      = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
+    Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocitySim = m_swerveSubsystem.driveFieldOriented(driveAngularVelocitySim);
+    Command driveRobotOrientedAngularVelocity  = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
     
-    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
     if (Robot.isSimulation())
     {
-      // m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      // m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-
-    }
-    if (DriverStation.isTest())
-    {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-
-      DRIVER_X_BUTTON.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      DRIVER_Y_BUTTON.whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      // m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      // m_driverController.back().whileTrue(drivebase.centerModulesCommand());
-      // m_driverController.leftBumper().onTrue(Commands.none());
-      // m_driverController.rightBumper().onTrue(Commands.none());
+      m_driverController.start().onTrue(Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocitySim);
+      DRIVER_B_BUTTON.whileTrue(
+          m_swerveSubsystem.pathfindThenFollowPath(
+              new Pose2d(
+              new Translation2d(5.287, 2.642), 
+              Rotation2d.fromDegrees(51.212))));
     } else
     {
-      DRIVER_Y_BUTTON.whileTrue(drivebase.centerModulesCommand());
-      DRIVER_A_BUTTON.onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      DRIVER_X_BUTTON.onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      DRIVER_Y_BUTTON.whileTrue(m_swerveSubsystem.centerModulesCommand());
+      DRIVER_A_BUTTON.onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+      DRIVER_X_BUTTON.onTrue(Commands.runOnce(m_swerveSubsystem::addFakeVisionReading));
       DRIVER_B_BUTTON.whileTrue(
-          drivebase.driveToPose(
-              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-                              );
-      // m_driverController.start().whileTrue(Commands.none());
-      // m_driverController.back().whileTrue(Commands.none());
-      DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      // m_driverController.rightBumper().onTrue(Commands.none());
+          m_swerveSubsystem.pathfindThenFollowPath(
+              new Pose2d(
+              new Translation2d(5.287, 2.642), 
+              Rotation2d.fromDegrees(51.212))));
+
+      DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
     }
 
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand()
   {
-    // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return autoChooser.getSelected();
   }
 
   public void setMotorBrake(boolean brake)
   {
-    drivebase.setMotorBrake(brake);
+    m_swerveSubsystem.setMotorBrake(brake);
   }
 }
