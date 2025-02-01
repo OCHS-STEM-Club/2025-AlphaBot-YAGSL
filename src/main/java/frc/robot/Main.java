@@ -15,7 +15,8 @@ public final class Main
 
   private Main()
   {
-    //Scary comment
+    //Scary comment again
+    // Boo
   }
 
   /**
