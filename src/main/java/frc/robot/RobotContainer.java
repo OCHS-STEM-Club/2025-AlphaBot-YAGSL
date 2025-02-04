@@ -60,9 +60,9 @@ public class RobotContainer
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-                                                                () -> m_driverController.getLeftY() * 1,
-                                                                () -> m_driverController.getLeftX() * 1)
+  SwerveInputStream driveAngularVelocityRedAlliance = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+                                                                () -> m_driverController.getLeftY() * -1,
+                                                                () -> m_driverController.getLeftX() * -1)
                                                             .withControllerRotationAxis(() -> m_driverController.getRawAxis(4) * -1)
                                                             .deadband(0.1)
                                                             .scaleTranslation(0.8)
@@ -76,18 +76,26 @@ public class RobotContainer
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
 
+   SwerveInputStream driveAngularVelocityBlueAlliance = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+                                                                () -> m_driverController.getLeftY() * -1,
+                                                                () -> m_driverController.getLeftX() * -1)
+                                                            .withControllerRotationAxis(() -> m_driverController.getRawAxis(4) * -1)
+                                                            .deadband(0.1)
+                                                            .scaleTranslation(0.8)
+                                                            .allianceRelativeControl(true);
+
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
    */
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(m_driverController::getRightX,
+  SwerveInputStream driveDirectAngle = driveAngularVelocityRedAlliance.copy().withControllerHeadingAxis(m_driverController::getRightX,
                                                                                              m_driverController::getRightY)
                                                            .headingWhile(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
    */
-  SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+  SwerveInputStream driveRobotOriented = driveAngularVelocityRedAlliance.copy().robotRelative(true)
                                                              .allianceRelativeControl(false);
 
  
@@ -110,12 +118,17 @@ public class RobotContainer
   {
 
     Command driveFieldOrientedDirectAngle      = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocityRedAlliance = m_swerveSubsystem.driveFieldOriented(driveAngularVelocityRedAlliance);
+    Command driveFieldOrientedAnglularVelocityBlueAlliance = m_swerveSubsystem.driveFieldOriented(driveAngularVelocityBlueAlliance);
     Command driveFieldOrientedAnglularVelocitySim = m_swerveSubsystem.driveFieldOriented(driveAngularVelocitySim);
     Command driveRobotOrientedAngularVelocity  = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
-    
-    m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    if(m_swerveSubsystem.isRedAlliance() == true){
+      m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocityRedAlliance);
+    }else{
+      m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocityBlueAlliance);
+    }
+
 
     if (Robot.isSimulation())
     {
