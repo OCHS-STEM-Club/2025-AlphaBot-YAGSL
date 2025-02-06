@@ -137,7 +137,7 @@ public class SwerveSubsystem extends SubsystemBase
         Pose[2] = backLeftVisionEsimatedPoseObj.get().estimatedPose.toPose2d().getRotation().getDegrees();
         visionEsimatedStdDevs = m_visionSubsystem.getBackleftEstimationStdDevs(backLeftVisionEsimatedPoseObj.get().estimatedPose.toPose2d()); //Get the Standard Deviation
         // Add the vision measurement to the swerve drive
-        // swerveDrive.addVisionMeasurement(backLeftVisionEsimatedPoseObj.get().estimatedPose.toPose2d(), backLeftVisionEsimatedPoseObj.get().timestampSeconds, visionEsimatedStdDevs);
+        swerveDrive.addVisionMeasurement(backLeftVisionEsimatedPoseObj.get().estimatedPose.toPose2d(), backLeftVisionEsimatedPoseObj.get().timestampSeconds, visionEsimatedStdDevs);
         // Log the vision pose
         Logger.recordOutput("Vision Pose", Pose);
         Logger.recordOutput("Vision Pose String", backLeftVisionEsimatedPoseObj.get().estimatedPose.toString());
