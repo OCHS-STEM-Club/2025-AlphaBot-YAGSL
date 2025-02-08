@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Commands.AbsoluteDriveAdv;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.io.File;
@@ -53,6 +54,7 @@ public class RobotContainer {
   // Subsystem Defintions
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/falcon"));
+  ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
@@ -170,6 +172,13 @@ public class RobotContainer {
       DRIVER_Y_Button.whileTrue(m_swerveSubsystem.driveToDistanceCommand(1.0, 0.2));
       // SysID CMD
       DRIVER_POV_UP.whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+      // Climber
+      DRIVER_RIGHT_TRIGGER.whileTrue(Commands.runOnce(() ->m_climberSubsystem.climberMotorUp()));
+      DRIVER_RIGHT_TRIGGER.whileFalse(Commands.runOnce(() ->m_climberSubsystem.climberMotorStop()));
+
+      DRIVER_LEFT_TRIGGER.whileTrue(Commands.runOnce(() ->m_climberSubsystem.servoUp()));
+      DRIVER_RIGHT_TRIGGER.whileTrue(Commands.runOnce(() ->m_climberSubsystem.servoDown()));
+      DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(() ->m_climberSubsystem.servoStop()));
 
     }
 

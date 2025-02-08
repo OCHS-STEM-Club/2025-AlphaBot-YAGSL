@@ -40,4 +40,9 @@ public final class Constants {
     
 
   }
+
+  public static class climberConstants {
+    public static final int kClimberMotorID = 24;
+    public static final int kClimberServoID = 9;
+  }
 }
