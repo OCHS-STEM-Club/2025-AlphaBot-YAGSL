@@ -4,12 +4,11 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Volts;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.config.PIDConstants;
@@ -60,6 +59,10 @@ public final class Constants {
 
   }
 
+  public static class ClimberConstants {
+     public static final int kClimberMotorID = 24;
+  }
+
   public static class VisionConstants {
     // Camera Definitions
     public static final String CAMERA_NAME = "Center";
@@ -78,7 +81,7 @@ public final class Constants {
 
 
    public static final class ElevatorConstants {
-    public static final int ELEVATOR_LEFT_CAN_ID = 18;
+    public static final int ELEVATOR_LEFT_CAN_ID = 24;
     public static final int ELEVATOR_RIGHT_CAN_ID = 19;
 
     // Gear ratio
@@ -139,4 +142,6 @@ public final class Constants {
     public static final TrapezoidProfile.State L3_GOAL = new TrapezoidProfile.State(L3_POSITION.magnitude(), 10);
     public static final TrapezoidProfile.State L4_GOAL = new TrapezoidProfile.State(L4_POSITION.magnitude(), 10);
   }
+
+
 }

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -59,6 +60,8 @@ public class RobotContainer
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/falcon"));
 
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+
+  private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -141,11 +144,18 @@ public class RobotContainer
               new Translation2d(5.287, 2.642), 
               Rotation2d.fromDegrees(51.212))));
 
-      DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
+      //DRIVER_LEFT_BUMPER.whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
 
       DRIVER_X_BUTTON.onTrue(m_elevatorSubsystem.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(100)));
+
+      DRIVER_RIGHT_TRIGGER.whileTrue(Commands.runOnce(() ->m_climberSubsystem.climberMotorUp()));
+      DRIVER_RIGHT_TRIGGER.whileFalse(Commands.runOnce(() ->m_climberSubsystem.climberMotorStop()));
+      DRIVER_LEFT_TRIGGER.whileTrue(Commands.runOnce(() ->m_climberSubsystem.climberMotorDown()));
+      DRIVER_LEFT_TRIGGER.whileFalse(Commands.runOnce(() ->m_climberSubsystem.climberMotorStop()));
     }
 
+
+    
   }
 
   public Command getAutonomousCommand()
