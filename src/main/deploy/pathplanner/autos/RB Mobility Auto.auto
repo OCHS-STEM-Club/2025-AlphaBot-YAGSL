@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Test"
+            "pathName": "RB Mobility"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "RB Auto",
   "choreoAuto": false
 }

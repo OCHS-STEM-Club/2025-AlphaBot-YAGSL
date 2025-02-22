@@ -115,6 +115,7 @@ public class RobotContainer
 
     NamedCommands.registerCommand("Climber Up", Commands.runOnce(m_climberSubsystem::climberMotorUp));
     NamedCommands.registerCommand("Climber Down", Commands.runOnce(m_climberSubsystem::climberMotorDown));
+    NamedCommands.registerCommand("Climber Stop", Commands.runOnce(m_climberSubsystem::climberMotorStop));
 
   }
 
