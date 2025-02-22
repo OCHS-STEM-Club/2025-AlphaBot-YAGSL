@@ -4,26 +4,25 @@
 
 package frc.robot;
 
+import java.io.File;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-
-import java.io.File;
 import swervelib.SwerveInputStream;
 
 /**
@@ -36,6 +35,8 @@ public class RobotContainer
 
   // Choosers
   private final SendableChooser<Command> autoChooser;
+  
+
 
   // Controller Definitions
   final CommandXboxController m_driverController = new CommandXboxController(0);
@@ -101,6 +102,7 @@ public class RobotContainer
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
+
   public RobotContainer()
   {
     // Configure the trigger bindings
@@ -110,6 +112,10 @@ public class RobotContainer
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    NamedCommands.registerCommand("Climber Up", Commands.runOnce(m_climberSubsystem::climberMotorUp));
+    NamedCommands.registerCommand("Climber Down", Commands.runOnce(m_climberSubsystem::climberMotorDown));
+
   }
 
   private void configureBindings()
